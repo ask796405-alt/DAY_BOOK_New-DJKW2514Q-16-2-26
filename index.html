@@ -1,0 +1,2376 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Purchase App</title>
+
+<!-- Mobile First -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Purchase App">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<link rel="manifest" href="manifest.json">
+
+<!-- App Icons -->
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<style>
+/* ===============================
+   PERFORMANCE-FIRST DESIGN SYSTEM
+   =============================== */
+
+:root{
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --border:rgba(15,23,42,.08);
+
+  --blue:#2563eb;
+  --blue-soft:#dbeafe;
+
+  --text:#0f172a;
+  --muted:#64748b;
+
+  --shadow-sm:0 4px 12px rgba(15,23,42,.06);
+  --shadow-md:0 12px 28px rgba(15,23,42,.10);
+}
+
+/* ===============================
+   RESET (LIGHTWEIGHT)
+   =============================== */
+
+*{
+  box-sizing:border-box;
+  font-family:Inter,system-ui,-apple-system;
+}
+
+html,body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ===============================
+   PAGE SYSTEM
+   =============================== */
+
+.page{
+  display:none;
+  min-height:100svh;
+  padding:22px 18px 160px;
+}
+
+.page.active{
+  display:block;
+  animation:pageIn .25s ease-out;
+}
+
+@keyframes pageIn{
+  from{opacity:0; transform:translateY(10px)}
+  to{opacity:1; transform:none}
+}
+
+/* ===============================
+   HEADERS
+   =============================== */
+
+h2{
+  margin:6px 0 18px;
+  font-size:20px;
+  font-weight:600;
+  letter-spacing:.2px;
+}
+
+/* ===============================
+   FORM
+   =============================== */
+
+form{
+  background:var(--card);
+  border-radius:22px;
+  padding:22px;
+  box-shadow:var(--shadow-md);
+}
+
+input{
+  width:100%;
+  padding:15px 16px;
+  margin-bottom:14px;
+
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:#f9fafb;
+
+  font-size:14px;
+  outline:none;
+
+  transition:transform .15s ease, border-color .15s ease;
+}
+/* ===== Make select look like input ===== */
+
+select{
+  width:100%;
+  padding:15px 16px;
+  margin-bottom:14px;
+
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:#f9fafb;
+
+  font-size:14px;
+  outline:none;
+
+  transition:transform .15s ease, border-color .15s ease;
+
+  /* Remove default browser style */
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+
+  /* Custom arrow */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%2364758b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 8 9 11 12 8'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  background-size:18px;
+}
+
+select:focus{
+  border-color:var(--blue);
+  background:white;
+  transform:translateY(-1px);
+}
+
+input:focus{
+  border-color:var(--blue);
+  background:white;
+  transform:translateY(-1px);
+}
+
+/* ===============================
+   PRIMARY BUTTON
+   =============================== */
+
+form button{
+  width:100%;
+  padding:16px;
+  border-radius:999px;
+  border:none;
+
+  font-size:15px;
+  font-weight:600;
+  color:white;
+
+  background:linear-gradient(180deg,#3b82f6,#2563eb);
+  box-shadow:0 8px 22px rgba(37,99,235,.35);
+
+  transition:transform .12s ease;
+}
+
+form button:active{
+  transform:scale(.96);
+}
+
+/* ===============================
+   CARDS
+   =============================== */
+
+.card{
+  background:var(--card);
+  border-radius:16px;
+  padding:16px 18px;
+  margin:14px 0;
+
+  font-size:14px;
+  line-height:1.6;
+
+  box-shadow:var(--shadow-sm);
+
+  transition:transform .15s ease;
+}
+
+.card:hover{
+  transform:translateY(-3px);
+}
+
+.card:active{
+  transform:scale(.97);
+}
+
+.card b{
+  color:var(--blue);
+}
+
+/* ===============================
+   TOP NAV BUTTONS
+   =============================== */
+
+.top-nav-btn{
+  width:46px;
+  height:46px;
+  border-radius:22px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:linear-gradient(180deg,#ffffff,#f1f5f9);
+  border:1px solid var(--border);
+
+  box-shadow:var(--shadow-sm);
+  transition:transform .12s ease;
+}
+
+.top-nav-btn:active{
+  transform:scale(.92);
+}
+
+.top-nav-btn svg{
+  width:22px;
+  height:22px;
+  stroke:#0f172a;
+  stroke-width:2.2;
+}
+
+/* ===============================
+   SAVE POPUP
+   =============================== */
+
+#savePopup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.35);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s ease;
+  z-index:999;
+}
+
+#savePopup.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.popup-card{
+  background:white;
+  border-radius:24px;
+  padding:26px;
+  width:85%;
+  max-width:320px;
+  text-align:center;
+
+  box-shadow:var(--shadow-md);
+  animation:pop .2s ease-out;
+}
+
+@keyframes pop{
+  from{transform:scale(.92); opacity:0}
+  to{transform:scale(1); opacity:1}
+}
+
+.popup-card .check{
+  width:54px;
+  height:54px;
+  margin:0 auto 12px;
+  border-radius:50%;
+
+  background:linear-gradient(180deg,#3b82f6,#2563eb);
+  color:white;
+  font-size:26px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ===============================
+   BOTTOM NAV BAR
+   =============================== */
+
+nav{
+  position:fixed;
+  left:16px;
+  right:16px;
+  bottom:16px;
+
+  background:linear-gradient(180deg,#ffffff,#f1f5f9);
+  border-radius:26px;
+
+  display:flex;
+  gap:6px;
+  padding:6px;
+
+  box-shadow:0 14px 30px rgba(15,23,42,.18);
+}
+
+nav button{
+  all:unset;
+  flex:1;
+
+  height:46px;
+  border-radius:22px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+  transition:transform .12s ease;
+}
+
+nav button svg{
+  width:22px;
+  height:22px;
+  stroke:#64748b;
+}
+
+nav button:active{
+  transform:scale(.92);
+}
+
+nav button:active svg{
+  stroke:var(--blue);
+}
+
+/* ===============================
+   LEDGER TITLE
+   =============================== */
+
+#ledgerTitle{
+  font-size:22px;
+  font-weight:600;
+  margin-bottom:14px;
+}
+/* ===============================
+   SORT BUTTON (PREMIUM)
+   =============================== */
+
+.sort-btn{
+  width:38px;
+  height:38px;
+  border-radius:22px;
+
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:1px solid rgba(15,23,42,.08);
+  background:linear-gradient(180deg,#ffffff,#f1f5f9);
+
+  box-shadow:0 6px 16px rgba(15,23,42,.08);
+
+  cursor:pointer;
+  transition:all .18s ease;
+}
+
+.sort-btn svg{
+  width:18px;
+  height:18px;
+  stroke:#475569;
+  stroke-width:2.2; 
+}
+
+.sort-btn:active{
+  transform:scale(.92);
+}
+
+.sort-btn.active{
+  background:linear-gradient(180deg,#3b82f6,#2563eb);
+  box-shadow:0 8px 20px rgba(37,99,235,.35);
+}
+
+.sort-btn.active svg{
+  stroke:white;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ===== PAYMENT STICKY AREA ===== */
+
+
+.payment-form{
+  max-width:520px;
+  margin-bottom:14px;
+}
+
+.payment-search{
+  width:100%;
+  max-width:520px;
+  padding:14px 16px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:white;
+  margin-bottom:6px;
+  font-size:14px;
+}
+
+.payment-list{
+  margin-top:10px;
+  max-width:520px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- SAVE POPUP -->
+<div id="savePopup">
+  <div class="popup-card">
+    <div class="check">✓</div>
+    <h3>Saved Successfully</h3>
+    <p>Your purchase entry has been saved.</p>
+  </div>
+</div>
+
+<!-- PAGE 1 -->
+<div id="home" class="page active">
+<h2>Purchases</h2>
+
+
+<div style="margin-bottom:16px;">
+  <button
+    id="resetEditBtn"
+    class="top-nav-btn"
+    style="display:none"
+    onclick="resetEditMode()"
+    title="Back to Add Entry"
+  >
+    <i data-lucide="rotate-ccw"></i>
+  </button>
+</div>
+
+
+<form id="form">
+<input type="date" name="date" required>
+<input name="product" placeholder="Product" required>
+<input name="quantity" placeholder="Quantity (eg: 100 CFT)">
+<input type="number" name="purchase_price" placeholder="Purchase Price">
+<input type="number" name="selling_price" placeholder="Selling Price">
+<input name="supplier" placeholder="Supplier">
+<input name="transporter" placeholder="Transporter">
+<input type="number" name="transport_cost" placeholder="Transport Cost">
+<input name="customer" placeholder="Customer">
+<input name="delivery_place" placeholder="Delivery Place">
+<button>Add Entry</button>
+</form>
+</div>
+
+<!-- PAGE 2 -->
+<div id="select" class="page">
+<h2>Select Supplier</h2>
+<input
+  type="text"
+  id="supplierSearch"
+  placeholder="Search supplier..."
+  oninput="filterSuppliers()"
+  style="
+    width:100%;
+    padding:14px 16px;
+    border-radius:14px;
+    border:1px solid rgba(0,0,0,.08);
+    margin-bottom:14px;
+    font-size:14px;
+  "
+/>
+
+<div id="list"></div>
+</div>
+
+<!-- LEDGER -->
+<div id="ledger" class="page">
+
+  
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+  <button class="top-nav-btn" onclick="goBack()">
+  <i data-lucide="arrow-left"></i>
+  </button>
+
+    <button class="top-nav-btn" onclick="downloadPDF()">
+  <i data-lucide="file-text"></i>
+   </button>
+  </div>
+  <input
+  type="text"
+  id="searchInput"
+  placeholder="Search by date, item, qty, amount…"
+  oninput="filterLedger()"
+  style="
+    width:100%;
+    padding:14px 16px;
+    border-radius:14px;
+    border:1px solid rgba(0,0,0,.08);
+    margin-bottom:14px;
+    font-size:14px;
+  "
+/>
+
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <h2 id="ledgerTitle" style="margin:0"></h2>
+
+    <div style="display:flex;gap:8px;align-items:center">
+      <!-- Short PDF button: downloads the first-5-columns PDF -->
+      <button id="downloadShortBtn" class="top-nav-btn" title="Download short PDF (first 5 columns)">
+        <i data-lucide="download-cloud"></i>
+      </button>
+
+      <!-- Sort button (red box area) -->
+      <button
+        id="sortBtn"
+        onclick="toggleSort()"
+        class="sort-btn"
+        title="Sort by date"
+      >
+        <i data-lucide="arrow-down-up"></i>
+      </button>
+    </div>
+  </div>
+
+
+  <div id="ledgerRows"></div>
+
+</div>
+
+<!-- PAGE 3 -->
+<div id="all" class="page">
+<h2>All Customers</h2>
+<input
+  type="text"
+  id="customerSearch"
+  placeholder="Search customer..."
+  oninput="filterCustomers()"
+  style="
+    width:100%;
+    padding:14px 16px;
+    border-radius:14px;
+    border:1px solid rgba(0,0,0,.08);
+    margin-bottom:14px;
+    font-size:14px;
+  "
+/>
+
+<div id="summary"></div>
+
+</div>
+
+<!-- PAGE: PAYMENTS -->
+<div id="payments" class="page">
+
+  <div class="payment-sticky">
+
+    <div style="display:flex;justify-content:space-between;align-items:center">
+  <h2>Payments</h2>
+  <button class="top-nav-btn" onclick="downloadPaymentStatement()">
+    <i data-lucide="file-text"></i>
+  </button>
+</div>
+
+
+    <form id="paymentForm" class="card payment-form">
+
+      <label style="display:block;margin-bottom:8px;font-weight:600">Party Type</label>
+
+      <select name="party_type" required>
+        <option value="supplier">Supplier</option>
+        <option value="customer">Customer</option>
+      </select>
+
+      <input name="party_name" placeholder="Supplier / Customer" required>
+      <input type="date" name="date" required>
+      <input name="mode" placeholder="Mode (eg UPI, Cash, Supplies)">
+      <input type="number" step="0.01" name="amount" placeholder="Amount (₹)" required>
+
+      <button>Add Payment</button>
+    </form>
+
+    <!-- 🔍 Search Bar -->
+    <input
+      type="text"
+      id="paymentSearch"
+      placeholder="Search payments..."
+      class="payment-search"
+    >
+
+  </div>
+
+  <!-- Payment list -->
+  <div id="paymentList" class="payment-list"></div>
+
+</div>
+
+
+<nav>
+<button onclick="show('home')"><i data-lucide="home"></i></button>
+<button onclick="loadList()"><i data-lucide="file-text"></i></button>
+<button onclick="loadSummary()"><i data-lucide="users"></i></button>
+<!-- optional nav button: open payments -->
+<button onclick="show('payments')">
+  <i data-lucide="credit-card"></i>
+</button>
+
+</nav>
+
+<script>
+/* 🔒 YOUR ORIGINAL JS — UNTOUCHED */
+</script>
+
+<script>
+lucide.createIcons();
+
+document.querySelectorAll("button, .card").forEach(el=>{
+  el.addEventListener("mousemove", e=>{
+    const r = el.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    el.style.setProperty("--x", `${x}px`);
+    el.style.setProperty("--y", `${y}px`);
+  });
+});
+</script>
+
+<script>
+/* -------------------------
+   Supabase-backed Purchase App
+   Drop this in place of the old Google Apps Script API calls.
+   ------------------------- */
+
+const SUPABASE_URL = "https://wsypqgzpknmvwfdarugx.supabase.co"; // e.g. https://abcd.supabase.co
+const SUPABASE_KEY = "sb_publishable_3DiYrm7aNSbS27ZAYJDTlA_xuuMfAAq";
+
+const REST_BASE = SUPABASE_URL + "/rest/v1";
+const HEADERS = {
+  "apikey": SUPABASE_KEY,
+  "Authorization": `Bearer ${SUPABASE_KEY}`,
+  "Content-Type": "application/json",
+  "Accept": "application/json"
+};
+
+/* ================= GLOBAL ================= */
+let filteredLedgerData = [];
+window.ledgerData = [];
+let editingId = null; // null = new entry, number = edit mode
+
+/* ================= PAYMENTS STATE ================= */
+let paymentEditingId = null;
+let paymentData = [];
+
+function balanceStyle(balance, type){
+  if(balance < 0){
+    return `color:#dc2626;font-weight:600`; // red
+  }
+  if(type === "customer"){
+    return `color:#16a34a;font-weight:600`; // green
+  }
+  return `color:#2563eb;font-weight:600`; // blue (supplier)
+}
+
+
+
+/* ================= HELPERS (unchanged) ================= */
+function show(id, push = true){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');if(id === "payments"){
+  loadPayments();
+}
+
+
+  // 🔁 RESET SUPPLIER SEARCH
+  if(id === "select"){
+    const s = document.getElementById("supplierSearch");
+    if(s) s.value = "";
+    document.querySelectorAll("#list .card")
+      .forEach(c => c.style.display = "block");
+  }
+
+  // 🔁 RESET CUSTOMER SEARCH
+  if(id === "all"){
+    const c = document.getElementById("customerSearch");
+    if(c) c.value = "";
+    document.querySelectorAll("#summary .card")
+      .forEach(c => c.style.display = "block");
+  }
+
+  // 🔁 RESET LEDGER SEARCH
+  if(id === "ledger"){
+    resetSearch();
+  }
+
+  if(push){
+    history.pushState({ page: id }, "", `#${id}`);
+  }
+}
+
+
+function resetEditMode(){
+  editingId = null;
+  form.reset();
+  form.querySelector("button").innerText = "Add Entry";
+  document.getElementById("resetEditBtn").style.display = "none";
+  show("home");
+}
+
+
+
+function fmt(n){ 
+  return Number(n||0).toLocaleString("en-IN"); 
+}
+
+/* ================= FORMAT QUANTITY (unchanged) ================= */
+function formatQuantity(qty){
+  if(!qty) return "";
+  const match = qty.trim().match(/^([\d,.]+)\s*(.*)$/);
+  if(!match) return qty;
+
+  let number = match[1].replace(/,/g,"");
+  let unit = match[2] || "";
+
+  if(!isNaN(number)){
+    number = Number(number).toLocaleString("en-IN");
+  }
+  unit = unit.trim().toUpperCase();
+  return unit ? `${number} ${unit}` : number;
+}
+function cleanText(value){
+  if(!value) return null;
+  return value
+    .trim()              // remove start & end spaces
+    .replace(/\s+/g," "); // replace multiple spaces with single space
+}
+
+
+/* ================= SAVE (POST to Supabase purchases table) ================= */
+form.onsubmit = async e => {
+  e.preventDefault();
+
+  const qtyInput = form.querySelector('input[name="quantity"]');
+  qtyInput.value = formatQuantity(qtyInput.value);
+
+  // build payload reading same input names as before
+  const payload = {
+  date: form.querySelector('input[name="date"]').value || null,
+
+  product: cleanText(form.querySelector('input[name="product"]').value),
+  quantity: cleanText(form.querySelector('input[name="quantity"]').value),
+
+  purchase_price: form.querySelector('input[name="purchase_price"]').value
+  ? Number(form.querySelector('input[name="purchase_price"]').value)
+  : null,
+
+selling_price: form.querySelector('input[name="selling_price"]').value
+  ? Number(form.querySelector('input[name="selling_price"]').value)
+  : null,
+
+
+  supplier: cleanText(form.querySelector('input[name="supplier"]').value),
+  transporter: cleanText(form.querySelector('input[name="transporter"]').value),
+
+  transport_cost: form.querySelector('input[name="transport_cost"]').value
+    ? Number(form.querySelector('input[name="transport_cost"]').value)
+    : null,
+
+  customer: cleanText(form.querySelector('input[name="customer"]').value),
+  delivery_place: cleanText(form.querySelector('input[name="delivery_place"]').value)
+};
+
+
+  try {
+    // Insert into purchases table
+    let res;
+
+if(editingId){
+  res = await fetch(`${REST_BASE}/purchases?id=eq.${editingId}`, {
+    method: "PATCH",
+    headers: HEADERS,
+    body: JSON.stringify(payload)
+  });
+} else {
+  // INSERT (NEW ENTRY)
+  res = await fetch(`${REST_BASE}/purchases`, {
+    method: "POST",
+    headers: {
+      ...HEADERS,
+      Prefer: "return=minimal"
+    },
+    body: JSON.stringify(payload)
+  });
+}
+
+
+if(!res.ok){
+  const errText = await res.text();
+  throw new Error(errText);
+}
+
+
+    
+
+    // Optionally ensure supplier/customer exists (insert ignore)
+    const supName = payload.supplier;
+    if(supName){
+      // upsert supplier (simple insert attempt; unique constraint prevents duplicates)
+      fetch(`${REST_BASE}/suppliers`, {
+        method: "POST",
+        headers: HEADERS,
+        body: JSON.stringify({ name: supName })
+      }).catch(()=>{}); // ignore errors if already exists
+    }
+    const custName = payload.customer;
+    if(custName){
+      fetch(`${REST_BASE}/customers`, {
+        method: "POST",
+        headers: HEADERS,
+        body: JSON.stringify({ name: custName })
+      }).catch(()=>{});
+    }
+
+    // UX feedback (keeps original behavior)
+    savePopup.classList.add("show");
+form.reset();
+editingId = null;
+form.querySelector("button").innerText = "Add Entry";
+document.getElementById("resetEditBtn").style.display = "none";
+
+
+/* 🔽 ADD THESE TWO LINES HERE */
+editingId = null;                      // exit edit mode
+form.querySelector("button").innerText = "Add Entry";
+
+setTimeout(()=>savePopup.classList.remove("show"),1600);
+
+  } catch (err) {
+  console.error("SAVE ERROR:", err);
+  alert(err.message || "Save failed");
+}
+
+};
+
+/* ================= SUPPLIERS ================= */
+async function loadList(){
+  show("select");
+  const list = document.getElementById("list");
+  list.innerHTML = "Loading...";
+
+  try {
+    /* 1️⃣ Load suppliers */
+    const supRes = await fetch(`${REST_BASE}/suppliers?select=name`, { headers: HEADERS });
+    const suppliers = supRes.ok ? await supRes.json() : [];
+
+    /* 2️⃣ Load ALL purchases once */
+    const purRes = await fetch(
+      `${REST_BASE}/purchases?select=supplier,purchase_price`,
+      { headers: HEADERS }
+    );
+    const purchases = purRes.ok ? await purRes.json() : [];
+
+    /* 3️⃣ Load ALL payments once */
+    const payRes = await fetch(
+      `${REST_BASE}/payments?select=party_name,amount&party_type=eq.supplier`,
+      { headers: HEADERS }
+    );
+    const payments = payRes.ok ? await payRes.json() : [];
+
+    /* 4️⃣ Aggregate totals in JS */
+    const purchaseMap = {};
+    purchases.forEach(r=>{
+      if(!r.supplier) return;
+      purchaseMap[r.supplier] = (purchaseMap[r.supplier] || 0) + Number(r.purchase_price||0);
+    });
+
+    const paymentMap = {};
+    payments.forEach(r=>{
+      if(!r.party_name) return;
+      paymentMap[r.party_name] = (paymentMap[r.party_name] || 0) + Number(r.amount||0);
+    });
+
+    list.innerHTML = "";
+
+    /* 5️⃣ Render */
+    suppliers.forEach(obj=>{
+      const name = obj.name;
+      const totalPurchase = purchaseMap[name] || 0;
+      const totalPaid = paymentMap[name] || 0;
+      const balance = totalPurchase - totalPaid;
+
+      let color = "#2563eb";
+      if(balance < 0) color = "#dc2626";
+
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span>${name}</span>
+          <b style="color:${color}">₹ ${fmt(balance)}</b>
+        </div>
+      `;
+
+      card.onclick = ()=>{
+        localStorage.sel = name;
+        localStorage.ledgerType = "supplier";
+        loadLedger();
+      };
+
+      list.appendChild(card);
+    });
+
+  } catch(e){
+    console.error(e);
+    list.innerHTML = "Error loading suppliers";
+  }
+}
+
+
+/* ================= LEDGER ================= */
+async function loadLedger(){
+  show("ledger");
+
+  ledgerTitle.innerText = localStorage.sel || "";
+  ledgerRows.innerHTML = "Loading...";
+
+  try {
+    const name = localStorage.sel || "";
+    const type = localStorage.ledgerType === "supplier" ? "supplier" : "customer";
+
+    const qName = encodeURIComponent(name);
+    const url = `${REST_BASE}/purchases?select=id,date,product,quantity,purchase_price,selling_price,supplier,transporter,transport_cost,customer,delivery_place&${type}=eq.${qName}`;
+
+    const res = await fetch(url, { headers: HEADERS });
+    if(!res.ok) throw new Error("Ledger fetch failed");
+
+    const data = await res.json();
+
+    // ✅ Build clean ledger data (KEEP RAW DATE)
+    window.ledgerData = (data || []).map(r => ({
+      id: r.id,
+      dateRaw: r.date,
+      date: r.date
+        ? new Date(r.date).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+          })
+        : "",
+      product: r.product || "",
+      quantity: r.quantity || "",
+      purchase_price: r.purchase_price || 0,
+      selling_price: r.selling_price || 0,
+      supplier: r.supplier || "",
+      transporter: r.transporter || "",
+      transport_cost: r.transport_cost || 0,
+      customer: r.customer || "",
+      delivery_place: r.delivery_place || ""
+    }));
+
+    // ✅ Initialize filtered data
+    filteredLedgerData = [...window.ledgerData];
+
+    // ✅ Sort + render ONLY ONCE
+    applySort();
+
+  } catch (err) {
+    console.error(err);
+    ledgerRows.innerHTML = "Error loading ledger";
+  }
+}
+
+
+function editEntry(id){
+  const row = window.ledgerData.find(r => r.id === id);
+  if(!row) return;
+
+  editingId = id; // 🔒 enter edit mode
+
+  // Fill form fields
+  form.querySelector('input[name="date"]').value =
+    row.date ? new Date(row.date).toISOString().slice(0,10) : "";
+
+  form.querySelector('input[name="product"]').value = row.product;
+  form.querySelector('input[name="quantity"]').value = row.quantity;
+  form.querySelector('input[name="purchase_price"]').value = row.purchase_price;
+form.querySelector('input[name="selling_price"]').value = row.selling_price;
+  form.querySelector('input[name="supplier"]').value = row.supplier;
+  form.querySelector('input[name="transporter"]').value = row.transporter;
+  form.querySelector('input[name="transport_cost"]').value = row.transport_cost;
+  form.querySelector('input[name="customer"]').value = row.customer;
+  form.querySelector('input[name="delivery_place"]').value = row.delivery_place;
+
+  // UI change
+  show("home");
+  form.querySelector("button").innerText = "Update Entry";
+  document.getElementById("resetEditBtn").style.display = "flex";
+
+}
+
+/* ================= SEARCH ================= */
+function filterLedger(){
+  const q = document.getElementById("searchInput").value.toLowerCase();
+
+  filteredLedgerData = window.ledgerData.filter(r =>
+    `${r.product} ${r.customer} ${r.supplier} ${r.quantity} ${r.date}`
+      .toLowerCase()
+      .includes(q)
+  );
+
+  renderLedger(filteredLedgerData);
+}
+
+
+/* ================= BUILD SUPPLIES FROM FILTERED ROWS (NEW) ================= */
+function buildSuppliesFromRows(rows){
+  const map = {};
+
+  rows.forEach(r=>{
+    if(!r.product || !r.quantity) return;
+
+    // split quantity into number + unit
+    const match = r.quantity.trim().match(/^([\d,.]+)\s*(.*)$/);
+    if(!match) return;
+
+    const qty = Number(match[1].replace(/,/g,""));
+    const unit = (match[2] || "").toUpperCase().trim() || "PCS";
+
+    if(isNaN(qty)) return;
+
+    const key = `${r.product}__${unit}`;
+
+    map[key] = map[key] || {
+      product: r.product,
+      unit,
+      qty: 0
+    };
+
+    map[key].qty += qty;
+  });
+
+  return Object.values(map)
+    .map(o => `${o.product} : ${o.qty.toLocaleString("en-IN")} ${o.unit}`)
+    .join("\n");
+}
+
+
+function getLedgerPrice(row){
+  return localStorage.ledgerType === "customer"
+    ? Number(row.selling_price || 0)
+    : Number(row.purchase_price || 0);
+}
+
+/* ================= PDF (FORMAT UNCHANGED) ================= */
+async function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p", "mm", "a4");
+
+  const rows = filteredLedgerData.length
+    ? filteredLedgerData
+    : window.ledgerData;
+
+  if (!rows.length) {
+    alert("No data");
+    return;
+  }
+
+  const name = localStorage.sel;
+  const isCustomer = localStorage.ledgerType === "customer";
+  const today = new Date().toLocaleDateString("en-GB");
+
+  let y = 16;
+
+  /* ================= HEADER ================= */
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(16);
+  pdf.text("SA ENTERPRISE", 15, y);
+
+  y += 7;
+  pdf.setFontSize(12);
+  pdf.setFont("helvetica", "normal");
+  pdf.text("Ledger Statement", 15, y);
+
+  y += 10;
+  pdf.setFontSize(10);
+  pdf.text(`${isCustomer ? "Customer" : "Supplier"} : ${name}`, 15, y);
+  y += 6;
+  pdf.text(`Statement Date : ${today}`, 15, y);
+
+  /* ================= CALCULATIONS ================= */
+  let totalAmount = 0;
+  rows.forEach(r => {
+    totalAmount += isCustomer
+      ? Number(r.selling_price || 0)
+      : Number(r.purchase_price || 0);
+  });
+
+  const payRes = await fetch(
+    `${REST_BASE}/payments?select=date,mode,amount&party_type=eq.${localStorage.ledgerType}&party_name=eq.${encodeURIComponent(name)}`,
+    { headers: HEADERS }
+  );
+  const payments = payRes.ok ? await payRes.json() : [];
+  // 🔥 SORT OLDEST FIRST
+payments.sort((a, b) => {
+  return new Date(a.date) - new Date(b.date);
+});
+
+  const totalPayment = payments.reduce((s,p)=>s + Number(p.amount||0),0);
+  const balance = totalAmount - totalPayment;
+
+  /* ================= SUMMARY + SUPPLIES ================= */
+  y += 18;
+
+  const leftX = 15;
+  const rightX = 115;
+  let yLeft = y;
+  let yRight = y;
+
+  pdf.setFont("helvetica","bold");
+  pdf.setFontSize(11);
+  pdf.text("Summary", leftX, yLeft);
+  pdf.text("Supplies Summary", rightX, yRight);
+
+  yLeft += 6;
+  yRight += 6;
+
+  pdf.setFont("helvetica","normal");
+  pdf.setFontSize(10);
+
+  pdf.text("Total Amount", leftX, yLeft);
+  pdf.text(`Rs. ${fmt(totalAmount)}`, leftX + 75, yLeft, { align:"right" });
+  yLeft += 6;
+
+  pdf.text("Total Payment", leftX, yLeft);
+  pdf.text(`Rs. ${fmt(totalPayment)}`, leftX + 75, yLeft, { align:"right" });
+  yLeft += 6;
+
+  pdf.setFont("helvetica","bold");
+  pdf.text(
+    isCustomer ? "Balance Receivable" : "Balance Payable",
+    leftX,
+    yLeft
+  );
+  pdf.text(`Rs. ${fmt(balance)}`, leftX + 75, yLeft, { align:"right" });
+
+  pdf.setFont("helvetica","normal");
+  const supplies = buildSuppliesFromRows(rows).split("\n");
+  supplies.forEach(s=>{
+    pdf.text(s, rightX, yRight, { maxWidth: 75 });
+    yRight += 5;
+  });
+
+  y = Math.max(yLeft, yRight) + 14;
+
+  /* ============ COLUMN HEADER FUNCTION (NEW) ============ */
+  function drawLedgerHeader(){
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(10);
+
+    pdf.text("Date", 15, y);
+    pdf.text("Product", 41, y);
+    pdf.text("Qty", 70, y);
+    pdf.text("Price", 100, y);
+    pdf.text("Supplier", 125, y);
+    pdf.text("Customer", 155, y);
+    pdf.text("Place", 195, y, { align:"right" });
+
+    pdf.line(15, y + 2, 195, y + 2);
+
+    y += 7;
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(9);
+  }
+
+  /* ================= LEDGER TABLE ================= */
+  drawLedgerHeader(); // FIRST HEADER
+
+  rows.forEach(r => {
+    if (y > 270) {
+      pdf.addPage();
+      y = 20;
+      drawLedgerHeader(); // HEADER ON NEXT PAGE
+    }
+
+    const price = isCustomer
+      ? Number(r.selling_price || 0)
+      : Number(r.purchase_price || 0);
+
+    pdf.text(r.date || "-", 15, y);
+    pdf.text(r.product || "-", 41, y, { maxWidth: 35 });
+    pdf.text(r.quantity || "-", 70, y);
+    pdf.text(`Rs. ${fmt(price)}`, 100, y);
+    pdf.text(r.supplier || "-", 125, y, { maxWidth: 25 });
+    pdf.text(r.customer || "-", 155, y, { maxWidth: 25 });
+    pdf.text(r.delivery_place || "-", 195, y, { align:"right", maxWidth: 35 });
+
+    y += 6;
+  });
+
+  /* ================= PAYMENTS ================= */
+  if (payments.length) {
+    y += 10;
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(11);
+    pdf.text("Payment Details", 15, y);
+
+    y += 6;
+    pdf.setFontSize(9);
+    pdf.text("Date", 20, y);
+    pdf.text("Mode", 90, y);
+    pdf.text("Amount", 195, y, { align:"right" });
+    pdf.line(15, y + 2, 195, y + 2);
+
+    y += 6;
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(8);
+
+    payments.forEach(p => {
+      if (y > 270) {
+        pdf.addPage();
+        y = 20;
+      }
+
+       pdf.text(
+  p.date
+    ? new Date(p.date).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      })
+    : "-",
+  20,   // keep your original X value (20 or 30 depending on function)
+  y
+);
+
+      pdf.text(p.mode || "-", 90, y);
+      pdf.text(`Rs. ${fmt(p.amount)}`, 195, y, { align:"right" });
+
+      y += 6;
+    });
+  }
+
+  /* ================= FOOTER ================= */
+  pdf.setFontSize(8);
+  pdf.text(
+    "This is a computer-generated ledger statement.",
+    105,
+    290,
+    { align:"center" }
+  );
+
+  pdf.save(`Ledger_${name}.pdf`);
+}
+
+
+
+
+/*here*/
+
+async function downloadPDFShort(){
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p","mm","a4");
+
+  const isCustomer = localStorage.ledgerType === "customer";
+  const name = localStorage.sel;
+  const today = new Date().toLocaleDateString("en-GB");
+
+  const rows = filteredLedgerData.length
+    ? filteredLedgerData
+    : window.ledgerData;
+
+  if(!rows.length){
+    alert("No data");
+    return;
+  }
+
+  let totalAmount = 0;
+  rows.forEach(r=>{
+    totalAmount += isCustomer
+      ? Number(r.selling_price || 0)
+      : Number(r.purchase_price || 0);
+  });
+
+  const payRes = await fetch(
+    `${REST_BASE}/payments?select=date,mode,amount&party_type=eq.${localStorage.ledgerType}&party_name=eq.${encodeURIComponent(name)}`,
+    { headers: HEADERS }
+  );
+  const payments = payRes.ok ? await payRes.json() : [];
+  // 🔥 SORT OLDEST FIRST
+payments.sort((a, b) => {
+  return new Date(a.date) - new Date(b.date);
+});
+
+  const totalPayment = payments.reduce((s,p)=>s + Number(p.amount||0),0);
+  const balance = totalAmount - totalPayment;
+
+  let y = 18;
+
+  pdf.setFont("helvetica","bold");
+  pdf.setFontSize(16);
+  pdf.text("SA ENTERPRISE", 15, y);
+
+  y += 7;
+  pdf.setFontSize(12);
+  pdf.setFont("helvetica","normal");
+  pdf.text("Statement of Account", 15, y);
+
+  y += 10;
+  pdf.setFontSize(10);
+  pdf.text(`${isCustomer ? "Customer" : "Supplier"} : ${name}`, 15, y);
+  pdf.text(`Statement Date : ${today}`, 15, y + 6);
+
+  y += 18;
+
+  const leftX = 15;
+  const rightX = 110;
+  let yLeft = y;
+  let yRight = y;
+
+  pdf.setFont("helvetica","bold");
+  pdf.text("Summary", leftX, yLeft);
+  pdf.text("Supplies Summary", rightX, yRight);
+
+  yLeft += 6;
+  yRight += 6;
+
+  pdf.setFont("helvetica","normal");
+  pdf.text("Total Amount", leftX, yLeft);
+  pdf.text(`Rs. ${fmt(totalAmount)}`, leftX + 70, yLeft, { align:"right" });
+  yLeft += 6;
+
+  pdf.text("Total Payment", leftX, yLeft);
+  pdf.text(`Rs. ${fmt(totalPayment)}`, leftX + 70, yLeft, { align:"right" });
+  yLeft += 6;
+
+  pdf.setFont("helvetica","bold");
+  pdf.text(
+    isCustomer ? "Balance Receivable (Due)" : "Balance Payable",
+    leftX,
+    yLeft
+  );
+  pdf.text(`Rs. ${fmt(balance)}`, leftX + 70, yLeft, { align:"right" });
+
+  pdf.setFont("helvetica","normal");
+  const supplies = buildSuppliesFromRows(rows).split("\n");
+  supplies.forEach(s=>{
+    pdf.text(s, rightX, yRight, { maxWidth: 80 });
+    yRight += 5;
+  });
+
+  y = Math.max(yLeft, yRight) + 12;
+
+  pdf.setFont("helvetica","bold");
+  pdf.text("Supplies", 15, y);
+  y += 6;
+
+  pdf.setFontSize(9);
+  pdf.text("Date", 20, y);
+  pdf.text("Product", 60, y);
+  pdf.text("Qty", 115, y);
+  pdf.text("Amount", 170, y, { align:"right" });
+  pdf.line(15, y+2, 195, y+2);
+  y += 6;
+
+  pdf.setFont("helvetica","normal");
+  pdf.setFontSize(8);
+
+  rows.forEach(r=>{
+    if(y > 270){
+      pdf.addPage();
+      y = 20;
+
+      /* ===== ONLY ADDED HEADER ===== */
+      pdf.setFont("helvetica","bold");
+      pdf.setFontSize(9);
+      pdf.text("Date", 20, y);
+      pdf.text("Product", 60, y);
+      pdf.text("Qty", 115, y);
+      pdf.text("Amount", 170, y, { align:"right" });
+      pdf.line(15, y+2, 195, y+2);
+      y += 6;
+      pdf.setFont("helvetica","normal");
+      pdf.setFontSize(8);
+      /* ============================ */
+    }
+
+    const price = isCustomer ? r.selling_price : r.purchase_price;
+
+    pdf.text(r.date || "-", 20, y);
+    pdf.text(r.product || "-", 60, y, { maxWidth: 45 });
+    pdf.text(r.quantity || "-", 115, y);
+    pdf.text(`Rs. ${fmt(price)}`, 170, y, { align:"right" });
+    y += 6;
+  });
+
+  if(payments.length){
+    y += 8;
+    pdf.setFont("helvetica","bold");
+    pdf.text("Payments", 15, y);
+    y += 6;
+
+    pdf.setFontSize(9);
+    pdf.text("Date", 20, y);
+    pdf.text("Mode", 90, y);
+    pdf.text("Amount", 170, y, { align:"right" });
+    pdf.line(15, y+2, 195, y+2);
+    y += 6;
+
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(8);
+
+    payments.forEach(p=>{
+      if(y > 270){
+        pdf.addPage();
+        y = 20;
+      }
+
+      pdf.text(
+  p.date
+    ? new Date(p.date).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      })
+    : "-",
+  20,   // keep your original X value (20 or 30 depending on function)
+  y
+);
+      pdf.text(p.mode || "-", 90, y);
+      pdf.text(`Rs. ${fmt(p.amount)}`, 170, y, { align:"right" });
+      y += 6;
+    });
+  }
+
+  pdf.setFontSize(8);
+  pdf.text(
+    "This is a computer-generated statement.",
+    105,
+    290,
+    { align:"center" }
+  );
+
+  pdf.save(`Statement_${name}.pdf`);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ================= SUMMARY ================= */
+async function loadSummary(){
+  show("all");
+  summary.innerHTML = "Loading...";
+
+  try {
+    const custRes = await fetch(`${REST_BASE}/customers?select=name`, { headers: HEADERS });
+    const customers = custRes.ok ? await custRes.json() : [];
+
+    const saleRes = await fetch(
+      `${REST_BASE}/purchases?select=customer,selling_price`,
+      { headers: HEADERS }
+    );
+    const sales = saleRes.ok ? await saleRes.json() : [];
+
+    const payRes = await fetch(
+      `${REST_BASE}/payments?select=party_name,amount&party_type=eq.customer`,
+      { headers: HEADERS }
+    );
+    const payments = payRes.ok ? await payRes.json() : [];
+
+    const saleMap = {};
+    sales.forEach(r=>{
+      if(!r.customer) return;
+      saleMap[r.customer] = (saleMap[r.customer] || 0) + Number(r.selling_price||0);
+    });
+
+    const payMap = {};
+    payments.forEach(r=>{
+      if(!r.party_name) return;
+      payMap[r.party_name] = (payMap[r.party_name] || 0) + Number(r.amount||0);
+    });
+
+    summary.innerHTML = "";
+
+    customers.forEach(c=>{
+      const name = c.name;
+      const totalSale = saleMap[name] || 0;
+      const totalPaid = payMap[name] || 0;
+      const balance = totalSale - totalPaid;
+
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span>${name}</span>
+          <b style="${balanceStyle(balance,'customer')}">
+            ₹ ${fmt(balance)}
+          </b>
+        </div>
+      `;
+
+      card.onclick = ()=>{
+        localStorage.sel = name;
+        localStorage.ledgerType = "customer";
+        loadLedger();
+      };
+
+      summary.appendChild(card);
+    });
+
+  } catch(e){
+    console.error(e);
+    summary.innerHTML = "Error loading customers";
+  }
+}
+
+
+
+function goBack(){
+  if(localStorage.ledgerType==="supplier") show("select");
+  else if(localStorage.ledgerType==="customer") show("all");
+  else show("home");
+}
+
+/* keep lucide initialization that your page used */
+lucide.createIcons();
+
+let sortOrder = "desc"; // default: newest first
+
+function toggleSort(){
+  sortOrder = sortOrder === "desc" ? "asc" : "desc";
+
+  const btn = document.getElementById("sortBtn");
+  btn.classList.toggle("active", sortOrder === "asc");
+
+  applySort();
+}
+
+
+function applySort(){
+  const rows = filteredLedgerData.length
+    ? filteredLedgerData
+    : window.ledgerData;
+
+  rows.sort((a, b) => {
+    const da = new Date(a.dateRaw);
+    const db = new Date(b.dateRaw);
+    return sortOrder === "asc" ? da - db : db - da;
+  });
+
+  renderLedger(rows);
+}
+
+function isSupplierView(){
+  return localStorage.ledgerType === "supplier";
+}
+
+
+function resetSort(){
+  sortOrder = "desc"; // default
+  const btn = document.getElementById("sortBtn");
+  if(btn){
+    btn.classList.remove("active");
+  }
+}
+// wire short pdf button (safe if element exists)
+const shortBtn = document.getElementById("downloadShortBtn");
+if(shortBtn) shortBtn.addEventListener("click", downloadPDFShort);
+
+function resetSearch(){
+  const input = document.getElementById("searchInput");
+  if(input){
+    input.value = "";
+  }
+  filteredLedgerData = [];
+  const cards = document.querySelectorAll("#ledgerRows .card");
+  cards.forEach(c => c.style.display = "block");
+}
+
+
+<!-- Autocomplete helpers: paste after your existing JS (after REST_BASE & HEADERS) -->
+/* Lightweight autocomplete for "name" fields using your existing Supabase tables.
+   - Fields targeted: product, supplier, transporter, customer, delivery_place
+   - Excludes numeric-only entries (eg: "123", "  56 ")
+   - Sorts A→Z, dedupes, keyboard friendly
+*/
+
+const AUTOCOMPLETE_FIELDS = [
+  { name: "product", source: "purchases", column: "product" },
+  { name: "supplier", source: "suppliers", column: "name" },
+  { name: "transporter", source: "purchases", column: "transporter" },
+  { name: "customer", source: "customers", column: "name" },
+  { name: "delivery_place", source: "purchases", column: "delivery_place" }
+];
+
+
+// utility: is numeric-only string?
+function isNumericOnly(s){
+  if(!s) return false;
+  return /^\s*[\d,.\s]+\s*$/.test(s);
+}
+
+// fetch distinct values for a given source+column
+async function fetchDistinct(source, column){
+  try {
+    // prefer dedicated tables (suppliers/customers) if source matches
+    if(source === "suppliers" || source === "customers"){
+      const url = `${REST_BASE}/${source}?select=${encodeURIComponent(column)}`;
+      const res = await fetch(url, { headers: HEADERS });
+      if(!res.ok) throw new Error("fetch failed");
+      const arr = await res.json();
+      return arr.map(r => r[column]).filter(Boolean);
+    } else {
+      // purchases fallback — use select distinct via RPC-like query (returns duplicates often)
+      const url = `${REST_BASE}/purchases?select=${encodeURIComponent(column)}`;
+      const res = await fetch(url, { headers: HEADERS });
+      if(!res.ok) throw new Error("fetch failed");
+      const arr = await res.json();
+      return arr.map(r => r[column]).filter(Boolean);
+    }
+  } catch (e){
+    console.warn("Autocomplete fetch error", e);
+    return [];
+  }
+}
+
+// prepare suggestion list: dedupe, filter numeric-only, trim, alphabetical
+function prepareSuggestions(arr){
+  const set = new Set();
+  arr.forEach(v=>{
+    if(!v) return;
+    const txt = String(v).trim();
+    if(!txt) return;
+    if(isNumericOnly(txt)) return; // skip numeric-only
+    set.add(txt);
+  });
+  return Array.from(set).sort((a,b)=> a.localeCompare(b, undefined, {sensitivity:"base"}));
+}
+
+/* --- UI: attach a dropdown to an input --- */
+function attachAutocomplete(inputEl, suggestions){
+  // create container
+  inputEl.setAttribute("autocomplete","off");
+  const wrap = document.createElement("div");
+  wrap.style.position = "relative";
+  wrap.className = "autocomplete-wrap";
+  inputEl.parentNode.insertBefore(wrap, inputEl);
+  wrap.appendChild(inputEl);
+
+  const list = document.createElement("div");
+  list.className = "autocomplete-list";
+  list.style.position = "absolute";
+  list.style.left = "0";
+  list.style.right = "0";
+  list.style.top = `calc(100% + 6px)`;
+  list.style.zIndex = 9999;
+  list.style.background = "white";
+  list.style.border = "1px solid rgba(15,23,42,.08)";
+  list.style.borderRadius = "10px";
+  list.style.boxShadow = "0 8px 24px rgba(2,6,23,.08)";
+  list.style.maxHeight = "240px";
+  list.style.overflow = "auto";
+  list.style.display = "none";
+  list.style.fontSize = "14px";
+  list.style.padding = "6px 6px";
+  wrap.appendChild(list);
+
+  let current = -1;
+  let filtered = suggestions;
+
+  function render(items){
+    list.innerHTML = "";
+    if(!items || items.length === 0){
+      list.style.display = "none";
+      return;
+    }
+    items.forEach((it, idx)=>{
+      const row = document.createElement("div");
+      row.className = "autocomplete-item";
+      row.textContent = it;
+      row.style.padding = "8px 10px";
+      row.style.borderRadius = "8px";
+      row.style.cursor = "pointer";
+      row.style.whiteSpace = "nowrap";
+      row.style.overflow = "hidden";
+      row.style.textOverflow = "ellipsis";
+
+      row.addEventListener("mouseenter", ()=> {
+        // highlight
+        clearHighlight();
+        current = idx;
+        row.style.background = "linear-gradient(90deg,#eef6ff,#f8fbff)";
+      });
+      row.addEventListener("mouseleave", ()=> {
+        row.style.background = "transparent";
+        current = -1;
+      });
+      row.addEventListener("click", ()=> {
+        inputEl.value = it;
+        hide();
+        inputEl.focus();
+      });
+      list.appendChild(row);
+    });
+    list.style.display = "block";
+  }
+
+  function clearHighlight(){
+    [...list.children].forEach(ch => ch.style.background = "transparent");
+  }
+
+  function highlight(index){
+    clearHighlight();
+    current = index;
+    const ch = list.children[index];
+    if(ch){
+      ch.style.background = "linear-gradient(90deg,#eef6ff,#f8fbff)";
+      // ensure visible
+      const top = ch.offsetTop;
+      const chH = ch.offsetHeight;
+      const visibleTop = list.scrollTop;
+      const visibleBottom = visibleTop + list.clientHeight;
+      if(top < visibleTop) list.scrollTop = top;
+      if(top + chH > visibleBottom) list.scrollTop = top + chH - list.clientHeight;
+    }
+  }
+
+  function hide(){
+    list.style.display = "none";
+    current = -1;
+  }
+
+  // input handlers
+  inputEl.addEventListener("input", (e)=>{
+    const q = inputEl.value.trim().toLowerCase();
+    if(!q){
+      filtered = suggestions.slice();
+    } else {
+      filtered = suggestions.filter(s => s.toLowerCase().includes(q));
+    }
+    render(filtered);
+  });
+
+  inputEl.addEventListener("keydown", (e)=>{
+    if(list.style.display === "none") return;
+    if(e.key === "ArrowDown"){
+      e.preventDefault();
+      if(current < filtered.length - 1) highlight(current + 1);
+      else highlight(0);
+    } else if(e.key === "ArrowUp"){
+      e.preventDefault();
+      if(current > 0) highlight(current - 1);
+      else highlight(filtered.length - 1);
+    } else if(e.key === "Enter"){
+      if(current >= 0 && current < filtered.length){
+        e.preventDefault();
+        inputEl.value = filtered[current];
+        hide();
+      }
+    } else if(e.key === "Escape"){
+      hide();
+      inputEl.blur();
+    }
+  });
+
+  // close on outside click
+  document.addEventListener("click", (ev) => {
+    if(!wrap.contains(ev.target)) hide();
+  });
+
+  // initial render: don't show until user types or focuses
+  inputEl.addEventListener("focus", ()=>{
+    const q = inputEl.value.trim().toLowerCase();
+    filtered = q ? suggestions.filter(s => s.toLowerCase().includes(q)) : suggestions.slice(0, 50);
+    render(filtered);
+  });
+}
+
+/* --- wire everything up --- */
+async function initAutocompletes(){
+  // fetch suggestions per configured field
+  for(const f of AUTOCOMPLETE_FIELDS){
+    const input = document.querySelector(`input[name="${f.name}"]`);
+    if(!input) continue;
+
+    // gather from dedicated table + purchases column (helps for product/transporter/delivery_place)
+    const vals1 = await fetchDistinct(f.source, f.column);
+    // if source is purchases and there is a dedicated table (eg: suppliers/customers), also try those
+    let vals2 = [];
+    if(f.name === "supplier"){
+      vals2 = await fetchDistinct("suppliers", "name");
+    } else if(f.name === "customer"){
+      vals2 = await fetchDistinct("customers", "name");
+    }
+
+    const all = prepareSuggestions([...(vals1||[]), ...(vals2||[])]);
+    attachAutocomplete(input, all);
+  }
+}
+
+// run after page load
+document.addEventListener("DOMContentLoaded", () => {
+  // small delay to ensure REST_BASE & HEADERS exist
+  setTimeout(initAutocompletes, 80);
+});
+
+window.addEventListener("popstate", (e) => {
+  const page = e.state?.page || "home";
+  show(page, false);
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const pageFromHash = location.hash.replace("#", "") || "home";
+  show(pageFromHash, false);
+});
+
+function renderLedger(rows){
+  ledgerRows.innerHTML = "";
+
+  rows.forEach(r=>{
+    ledgerRows.innerHTML += `
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <b>${r.product}</b><br>
+            ${r.customer || "-"} · ${r.date} · ${r.quantity || "-"} · 
+            ₹ ${fmt(isSupplierView() ? r.purchase_price : r.selling_price)}
+          </div>
+
+          <button class="top-nav-btn" onclick="editEntry(${r.id})">
+            <i data-lucide="pencil"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  lucide.createIcons();
+}
+
+function filterSuppliers(){
+  const q = document.getElementById("supplierSearch").value.toLowerCase();
+  const cards = document.querySelectorAll("#list .card");
+
+  cards.forEach(card=>{
+    const text = card.textContent.toLowerCase();
+    card.style.display = text.includes(q) ? "block" : "none";
+  });
+}
+function filterCustomers(){
+  const q = document.getElementById("customerSearch").value.toLowerCase();
+  const cards = document.querySelectorAll("#summary .card");
+
+  cards.forEach(card=>{
+    const text = card.textContent.toLowerCase();
+    card.style.display = text.includes(q) ? "block" : "none";
+  });
+}
+
+</script>
+<script>
+/* ================= PAYMENTS ================= */
+
+
+/* ================= PAYMENT SEARCH ================= */
+
+let filteredPaymentData = [];
+
+document
+  .getElementById("paymentSearch")
+  .addEventListener("input", function(){
+
+    const q = this.value.toLowerCase().trim();
+
+    if(!q){
+      filteredPaymentData = [];
+      renderPayments(paymentData); // normal newest order
+      return;
+    }
+
+    filteredPaymentData = paymentData.filter(p =>
+      `${p.party_name} ${p.party_type} ${p.mode} ${p.date}`
+        .toLowerCase()
+        .includes(q)
+    );
+
+    renderPayments(filteredPaymentData);
+});
+
+function resetPaymentSearch(){
+  const search = document.getElementById("paymentSearch");
+  if(search){
+    search.value = "";
+  }
+  filteredPaymentData = [];
+  renderPayments(paymentData);
+}
+
+document
+  .getElementById("paymentForm")
+  .addEventListener("click", resetPaymentSearch);
+
+/* GET TOTAL PAYMENTS FOR LEDGER */
+async function getTotalPayments(name, type){
+  if(!name) return 0;
+
+  try{
+    const res = await fetch(
+      `${REST_BASE}/payments?select=amount&party_type=eq.${type}&party_name=eq.${encodeURIComponent(name)}`,
+      { headers: HEADERS }
+    );
+
+    if(!res.ok) return 0;
+
+    const rows = await res.json();
+    return rows.reduce((sum,r)=>sum + Number(r.amount||0),0);
+
+  }catch(e){
+    console.warn("payment fetch error", e);
+    return 0;
+  }
+}
+</script>
+<script>
+/* ================= PAYMENT DROPDOWN ================= */
+
+async function loadPaymentNames(){
+  const type = document.querySelector('#paymentForm select[name="party_type"]').value;
+  const list = document.getElementById("partyNames");
+  list.innerHTML = "";
+
+  const table = type === "supplier" ? "suppliers" : "customers";
+
+  try{
+    const res = await fetch(
+      `${REST_BASE}/${table}?select=name`,
+      { headers: HEADERS }
+    );
+    if(!res.ok) return;
+
+    const rows = await res.json();
+    rows.forEach(r=>{
+      const opt = document.createElement("option");
+      opt.value = r.name;
+      list.appendChild(opt);
+    });
+  }catch(e){
+    console.warn("payment dropdown error", e);
+  }
+}
+
+/* reload names when party type changes */
+const paymentTypeSelect =
+  document.querySelector('#paymentForm select[name="party_type"]');
+
+paymentTypeSelect.addEventListener("change", () => {
+  localStorage.lastPaymentType = paymentTypeSelect.value;
+  loadPaymentNames();
+});
+/* initial load */
+document.addEventListener("DOMContentLoaded", loadPaymentNames);
+// 🔥 Restore last selected party type
+document.addEventListener("DOMContentLoaded", () => {
+  const typeSelect =
+    document.querySelector('#paymentForm select[name="party_type"]');
+
+  const savedType = localStorage.lastPaymentType || "supplier";
+
+  typeSelect.value = savedType;
+
+  loadPaymentNames();
+});
+
+
+/* ================= LOAD ALL PAYMENTS ================= */
+async function loadPayments(){
+  const paymentList = document.getElementById("paymentList");
+  if(!paymentList) return;
+
+  paymentList.innerHTML = "Loading...";
+
+  const res = await fetch(
+    `${REST_BASE}/payments?select=id,party_type,party_name,date,mode,amount&order=date.desc`,
+    { headers: HEADERS }
+  );
+
+  if(!res.ok){
+    paymentList.innerHTML = "Error loading payments";
+    return;
+  }
+
+  paymentData = await res.json();
+  renderPayments(paymentData);
+}
+
+/* ================= RENDER PAYMENTS ================= */
+function renderPayments(rows){
+  const paymentList = document.getElementById("paymentList");
+  paymentList.innerHTML = "";
+
+  if(!rows.length){
+    paymentList.innerHTML = `<div class="card">No payments found</div>`;
+    return;
+  }
+
+  rows.forEach(p=>{
+    paymentList.innerHTML += `
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <b>${p.party_name}</b><br>
+            ${p.party_type} · 
+            ${p.date ? new Date(p.date).toLocaleDateString("en-GB") : "-"} · 
+            ${p.mode || "-"} · 
+            ₹ ${fmt(p.amount)}
+          </div>
+
+          <div style="display:flex;gap:6px">
+  <button class="top-nav-btn" onclick="editPayment(${p.id})">
+    <i data-lucide="pencil"></i>
+  </button>
+
+  <button class="top-nav-btn" onclick="deletePayment(${p.id})">
+    <i data-lucide="trash-2"></i>
+  </button>
+</div>
+
+        </div>
+      </div>
+    `;
+  });
+
+  lucide.createIcons();
+}
+/* ================= EDIT PAYMENT ================= */
+function editPayment(id){
+  const p = paymentData.find(x => x.id === id);
+  if(!p) return;
+
+  paymentEditingId = id;
+
+  const f = document.getElementById("paymentForm");
+
+  f.party_type.value = p.party_type;
+  loadPaymentNames();
+
+  f.party_name.value = p.party_name;
+  f.date.value = p.date || "";
+  f.mode.value = p.mode || "";
+  f.amount.value = p.amount;
+
+  f.querySelector("button").innerText = "Update Payment";
+}
+
+/* ================= DELETE PAYMENT ================= */
+async function deletePayment(id){
+  if(!confirm("Are you sure you want to delete this payment?")) return;
+
+  const res = await fetch(
+    `${REST_BASE}/payments?id=eq.${id}`,
+    {
+      method: "DELETE",
+      headers: HEADERS
+    }
+  );
+
+  if(!res.ok){
+    alert("Delete failed");
+    return;
+  }
+
+  // if editing same payment, reset form
+  if(paymentEditingId === id){
+    paymentEditingId = null;
+    const f = document.getElementById("paymentForm");
+    f.reset();
+    f.querySelector("button").innerText = "Add Payment";
+  }
+
+  loadPayments(); // refresh list
+}
+
+/* ================= SAVE / UPDATE PAYMENT ================= */
+async function savePayment(form){
+  const payload = {
+    party_type: form.party_type.value,
+    party_name: cleanText(form.party_name.value),
+    date: form.date.value || null,
+    mode: cleanText(form.mode.value),
+    amount: Number(form.amount.value || 0)
+  };
+
+  if(!payload.party_name || !payload.amount){
+    alert("Payment name & amount required");
+    return;
+  }
+
+  let res;
+
+  if(paymentEditingId){
+    res = await fetch(
+      `${REST_BASE}/payments?id=eq.${paymentEditingId}`,
+      {
+        method: "PATCH",
+        headers: HEADERS,
+        body: JSON.stringify(payload)
+      }
+    );
+  } else {
+    res = await fetch(`${REST_BASE}/payments`, {
+      method: "POST",
+      headers: { ...HEADERS, Prefer: "return=minimal" },
+      body: JSON.stringify(payload)
+    });
+  }
+
+  if(!res.ok){
+    alert("Payment save failed");
+    return;
+  }
+
+  paymentEditingId = null;
+  // 🔥 Remember last selected type
+localStorage.lastPaymentType = payload.party_type;
+
+  const selectedType = payload.party_type;
+
+form.reset();
+
+// restore selected dropdown AFTER reset
+form.party_type.value = selectedType;
+
+form.querySelector("button").innerText = "Add Payment";
+
+  loadPayments();          // refresh list
+}
+
+/* ================= FORM SUBMIT ================= */
+document
+  .getElementById("paymentForm")
+  .addEventListener("submit", e=>{
+    e.preventDefault();
+    savePayment(e.target);
+  });
+
+
+
+/* ================= PARTY SELECTOR ================= */
+async function openPartySelector(){
+  const type = document.querySelector('#paymentForm select[name="party_type"]').value;
+  const box = document.getElementById("partySelector");
+
+  box.style.display = "block";
+  box.innerHTML = "Loading...";
+
+  const table = type === "supplier" ? "suppliers" : "customers";
+
+  const res = await fetch(
+    `${REST_BASE}/${table}?select=name&order=name.asc`,
+    { headers: HEADERS }
+  );
+
+  if(!res.ok){
+    box.innerHTML = "Error loading list";
+    return;
+  }
+
+  const rows = await res.json();
+  box.innerHTML = "";
+
+  rows.forEach(r=>{
+    const c = document.createElement("div");
+    c.className = "card";
+    c.textContent = r.name;
+
+    c.onclick = () => {
+      document.querySelector('#paymentForm input[name="party_name"]').value = r.name;
+      box.style.display = "none";
+    };
+
+    box.appendChild(c);
+  });
+}
+document
+  .querySelector('#paymentForm select[name="party_type"]')
+  .addEventListener("change", () => {
+    document.querySelector('#paymentForm input[name="party_name"]').value = "";
+    document.getElementById("partySelector").style.display = "none";
+  });
+
+
+/* ================= PARTY NAME AUTOCOMPLETE (PAYMENTS — WORKING) ================= */
+async function initPaymentPartyAutocomplete(){
+  const input = document.querySelector('#paymentForm input[name="party_name"]');
+  const typeSelect = document.querySelector('#paymentForm select[name="party_type"]');
+
+  if(!input || !typeSelect) return;
+
+  const suggestions = []; // 🔒 stable reference (IMPORTANT)
+
+  async function loadSuggestions(){
+    const type = typeSelect.value;
+    const source = type === "supplier" ? "suppliers" : "customers";
+
+    const vals = await fetchDistinct(source, "name");
+    const cleaned = prepareSuggestions(vals);
+
+    // 🔁 MUTATE ARRAY (DO NOT REASSIGN)
+    suggestions.length = 0;
+    suggestions.push(...cleaned);
+  }
+
+  // initial load
+  await loadSuggestions();
+
+  // attach UI ONCE
+  attachAutocomplete(input, suggestions);
+
+  // reload data when type changes
+  typeSelect.addEventListener("change", async () => {
+    input.value = "";
+    await loadSuggestions();
+  });
+}
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  initPaymentPartyAutocomplete();
+});
+
+// new
+async function downloadPaymentStatement(){
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p","mm","a4");
+
+  const form = document.getElementById("paymentForm");
+  const type = form.party_type.value;
+  const name = form.party_name.value.trim();
+
+  if(!name){
+    alert("Select Supplier / Customer first");
+    return;
+  }
+
+  // Fetch payments
+  const res = await fetch(
+    `${REST_BASE}/payments?select=date,mode,amount&party_type=eq.${type}&party_name=eq.${encodeURIComponent(name)}&order=date.asc`,
+    { headers: HEADERS }
+  );
+
+  if(!res.ok){
+    alert("Error loading payments");
+    return;
+  }
+
+  const payments = await res.json();
+
+  if(!payments.length){
+    alert("No payments found");
+    return;
+  }
+
+  let y = 18;
+  const today = new Date().toLocaleDateString("en-GB");
+
+  // ===== CALCULATE TOTAL FIRST =====
+  let total = payments.reduce((sum,p)=> sum + Number(p.amount || 0), 0);
+
+  // ===== HEADER =====
+  pdf.setFont("helvetica","bold");
+  pdf.setFontSize(16);
+  pdf.text("SA ENTERPRISE", 15, y);
+
+  y += 8;
+  pdf.setFontSize(12);
+  pdf.setFont("helvetica","normal");
+  pdf.text("Payment Statement", 15, y);
+
+  y += 10;
+  pdf.setFontSize(10);
+
+  pdf.text(`${type === "customer" ? "Customer" : "Supplier"} : ${name}`, 15, y);
+
+  y += 6;
+
+  // 🔥 STATEMENT DATE + TOTAL ON SAME LINE
+  pdf.text(`Statement Date : ${today}`, 15, y);
+
+  pdf.setFont("helvetica","bold");
+  pdf.text(`Total Payment : Rs. ${fmt(total)}`, 135, y, { align:"right" });
+
+  pdf.setFont("helvetica","normal");
+
+  y += 14;
+
+  // ===== TABLE HEADER =====
+  pdf.setFont("helvetica","bold");
+  pdf.text("Date", 20, y);
+  pdf.text("Mode", 80, y);
+  pdf.text("Amount", 195, y, { align:"right" });
+  pdf.line(15, y+2, 195, y+2);
+
+  y += 8;
+  pdf.setFont("helvetica","normal");
+  pdf.setFontSize(9);
+
+  // ===== PAYMENT ROWS =====
+  payments.forEach(p => {
+
+    if(y > 270){
+      pdf.addPage();
+      y = 20;
+    }
+
+    const formattedDate = p.date
+      ? new Date(p.date).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric"
+        })
+      : "-";
+
+    pdf.text(formattedDate, 20, y);
+    pdf.text(p.mode || "-", 80, y);
+    pdf.text(`Rs. ${fmt(p.amount)}`, 195, y, { align:"right" });
+
+    y += 6;
+  });
+
+  // ===== FOOTER =====
+  pdf.setFontSize(8);
+  pdf.text(
+    "This is a computer-generated payment statement.",
+    105,
+    290,
+    { align:"center" }
+  );
+
+  pdf.save(`Payment_Statement_${name}.pdf`);
+}
+
+</script>
+
+
+
+</body>
+</html>

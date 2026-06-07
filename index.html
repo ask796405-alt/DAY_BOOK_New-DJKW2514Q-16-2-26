@@ -15,6 +15,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
 <link rel="manifest" href="manifest.json">
 
@@ -424,6 +425,217 @@ html {
   max-width:520px;
 }
 
+/* ===== DASHBOARD ===== */
+.dashboard-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  margin-bottom:18px;
+}
+
+.dashboard-head h2{
+  margin:0;
+}
+
+.dashboard-head p{
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.dashboard-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+
+.metric-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  box-shadow:var(--shadow-sm);
+}
+
+.metric-card .metric-icon{
+  width:38px;
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  margin-bottom:14px;
+  color:var(--blue);
+  background:var(--blue-soft);
+}
+
+.metric-card .metric-icon svg{
+  width:20px;
+  height:20px;
+}
+
+.metric-card span{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:7px;
+}
+
+.metric-card strong{
+  display:block;
+  font-size:21px;
+  line-height:1.2;
+}
+
+.metric-card.profit .metric-icon{
+  color:#15803d;
+  background:#dcfce7;
+}
+
+.metric-card.receivable .metric-icon{
+  color:#7c3aed;
+  background:#ede9fe;
+}
+
+.metric-card.payable .metric-icon{
+  color:#c2410c;
+  background:#ffedd5;
+}
+
+.dashboard-chart-card,
+.dashboard-payment-card{
+  margin-top:14px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  box-shadow:var(--shadow-sm);
+}
+
+.dashboard-chart-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.dashboard-chart-head h3,
+.dashboard-payment-card h3{
+  margin:0;
+  font-size:15px;
+}
+
+.dashboard-chart-head p{
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.chart-wrap{
+  position:relative;
+  min-height:260px;
+}
+
+.payment-summary-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-top:12px;
+}
+
+.payment-summary-item{
+  padding:13px;
+  border-radius:12px;
+  background:#f8fafc;
+  border:1px solid var(--border);
+}
+
+.payment-summary-item span{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:5px;
+}
+
+.payment-summary-item strong{
+  font-size:16px;
+}
+
+.report-range{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr)) auto;
+  gap:10px;
+  align-items:end;
+  margin:0 0 14px;
+  padding:14px;
+  border-radius:16px;
+  background:white;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-sm);
+}
+
+.report-range label{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.report-range input{
+  margin:6px 0 0;
+  padding:11px 12px;
+  border-radius:10px;
+}
+
+.range-clear-btn{
+  min-height:42px;
+  padding:0 14px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:#f8fafc;
+  color:var(--text);
+  font-weight:600;
+}
+
+.dashboard-status{
+  min-height:18px;
+  margin-top:10px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+@media (min-width:760px){
+  .page{
+    max-width:1080px;
+    margin:0 auto;
+  }
+
+  .dashboard-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+
+  .dashboard-detail-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1.7fr) minmax(260px,.8fr);
+    gap:14px;
+  }
+
+  .dashboard-payment-card{
+    align-self:start;
+  }
+}
+
+@media (max-width:520px){
+  .report-range{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .range-clear-btn{
+    grid-column:1 / -1;
+  }
+}
+
 </style>
 </head>
 
@@ -438,8 +650,73 @@ html {
   </div>
 </div>
 
+<!-- PAGE: DASHBOARD -->
+<div id="dashboard" class="page active">
+  <div class="dashboard-head">
+    <div>
+      <h2>Dashboard</h2>
+      <p id="dashboardPeriod">This month overview</p>
+    </div>
+    <button class="top-nav-btn" onclick="loadDashboard()" title="Refresh dashboard">
+      <i data-lucide="refresh-cw"></i>
+    </button>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="metric-card">
+      <div class="metric-icon"><i data-lucide="indian-rupee"></i></div>
+      <span>Total sales this month</span>
+      <strong id="dashboardSales">₹ 0</strong>
+    </div>
+    <div class="metric-card profit">
+      <div class="metric-icon"><i data-lucide="trending-up"></i></div>
+      <span>Total profit this month</span>
+      <strong id="dashboardProfit">₹ 0</strong>
+    </div>
+    <div class="metric-card receivable">
+      <div class="metric-icon"><i data-lucide="arrow-down-left"></i></div>
+      <span>Total receivable</span>
+      <strong id="dashboardReceivable">₹ 0</strong>
+    </div>
+    <div class="metric-card payable">
+      <div class="metric-icon"><i data-lucide="arrow-up-right"></i></div>
+      <span>Total payable</span>
+      <strong id="dashboardPayable">₹ 0</strong>
+    </div>
+  </div>
+
+  <div class="dashboard-detail-grid">
+    <div class="dashboard-chart-card">
+      <div class="dashboard-chart-head">
+        <div>
+          <h3>Sales and profit trend</h3>
+          <p>Last six months</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="dashboardChart"></canvas>
+      </div>
+    </div>
+
+    <div class="dashboard-payment-card">
+      <h3>Payments this month</h3>
+      <div class="payment-summary-grid">
+        <div class="payment-summary-item">
+          <span>Received</span>
+          <strong id="dashboardReceived">₹ 0</strong>
+        </div>
+        <div class="payment-summary-item">
+          <span>Paid</span>
+          <strong id="dashboardPaid">₹ 0</strong>
+        </div>
+      </div>
+      <div id="dashboardStatus" class="dashboard-status"></div>
+    </div>
+  </div>
+</div>
+
 <!-- PAGE 1 -->
-<div id="home" class="page active">
+<div id="home" class="page">
 <h2>Purchases</h2>
 
 
@@ -498,11 +775,11 @@ html {
   
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
   <button class="top-nav-btn" onclick="goBack()">
-  <i data-lucide="arrow-left"></i>
+  <i data-lucide="circle-arrow-left"></i>
   </button>
 
     <button class="top-nav-btn" onclick="downloadPDF()">
-  <i data-lucide="file-text"></i>
+  <i data-lucide="file-down"></i>
    </button>
   </div>
   <input
@@ -542,6 +819,19 @@ html {
     </div>
   </div>
 
+  <div class="report-range" aria-label="Ledger PDF date range">
+    <label>
+      PDF from
+      <input type="date" id="ledgerDateFrom">
+    </label>
+    <label>
+      PDF to
+      <input type="date" id="ledgerDateTo">
+    </label>
+    <button class="range-clear-btn" type="button" onclick="clearDateRange('ledgerDateFrom','ledgerDateTo')">
+      Clear range
+    </button>
+  </div>
 
   <div id="ledgerRows"></div>
 
@@ -599,6 +889,20 @@ html {
       <button>Add Payment</button>
     </form>
 
+    <div class="report-range" aria-label="Payment statement date range">
+      <label>
+        Statement from
+        <input type="date" id="paymentDateFrom">
+      </label>
+      <label>
+        Statement to
+        <input type="date" id="paymentDateTo">
+      </label>
+      <button class="range-clear-btn" type="button" onclick="clearDateRange('paymentDateFrom','paymentDateTo')">
+        Clear range
+      </button>
+    </div>
+
     <!-- 🔍 Search Bar -->
     <input
       type="text"
@@ -616,8 +920,9 @@ html {
 
 
 <nav>
-<button onclick="show('home')"><i data-lucide="home"></i></button>
-<button onclick="loadList()"><i data-lucide="file-text"></i></button>
+<button onclick="show('dashboard')"><i data-lucide="layout-dashboard"></i></button>
+<button onclick="show('home')"><i data-lucide="clipboard-pen"></i></button>
+<button onclick="loadList()"><i data-lucide="user-star"></i></button>
 <button onclick="loadSummary()"><i data-lucide="users"></i></button>
 <!-- optional nav button: open payments -->
 <button onclick="show('payments')">
@@ -669,6 +974,7 @@ let editingId = null; // null = new entry, number = edit mode
 /* ================= PAYMENTS STATE ================= */
 let paymentEditingId = null;
 let paymentData = [];
+let dashboardChartInstance = null;
 
 function balanceStyle(balance, type){
   if(balance < 0){
@@ -685,9 +991,15 @@ function balanceStyle(balance, type){
 /* ================= HELPERS (unchanged) ================= */
 function show(id, push = true){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');if(id === "payments"){
-  loadPayments();
-}
+  document.getElementById(id).classList.add('active');
+
+  if(id === "dashboard"){
+    loadDashboard();
+  }
+
+  if(id === "payments"){
+    loadPayments();
+  }
 
 
   // 🔁 RESET SUPPLIER SEARCH
@@ -729,6 +1041,243 @@ function resetEditMode(){
 
 function fmt(n){ 
   return Number(n||0).toLocaleString("en-IN"); 
+}
+
+function formatMoney(value){
+  return `₹ ${fmt(Number(value || 0).toFixed(2))}`;
+}
+
+function getDateInputValue(id){
+  return document.getElementById(id)?.value || "";
+}
+
+function isDateInRange(dateValue, fromValue, toValue){
+  if(!dateValue) return !fromValue && !toValue;
+  const date = new Date(`${dateValue}T00:00:00`);
+  if(Number.isNaN(date.getTime())) return false;
+
+  if(fromValue){
+    const from = new Date(`${fromValue}T00:00:00`);
+    if(date < from) return false;
+  }
+
+  if(toValue){
+    const to = new Date(`${toValue}T23:59:59`);
+    if(date > to) return false;
+  }
+
+  return true;
+}
+
+function filterRowsByDate(rows, fromValue, toValue, dateKey = "date"){
+  return rows.filter(row => isDateInRange(row[dateKey], fromValue, toValue));
+}
+
+function formatPdfDate(value){
+  if(!value) return "-";
+  const date = new Date(`${value}T00:00:00`);
+  if(Number.isNaN(date.getTime())) return "-";
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+
+function formatRangeLabel(fromValue, toValue){
+  const format = value => formatPdfDate(value);
+  if(fromValue && toValue) return `${format(fromValue)} to ${format(toValue)}`;
+  if(fromValue) return `From ${format(fromValue)}`;
+  if(toValue) return `Up to ${format(toValue)}`;
+  return "All dates";
+}
+
+function clearDateRange(fromId, toId){
+  const from = document.getElementById(fromId);
+  const to = document.getElementById(toId);
+  if(from) from.value = "";
+  if(to) to.value = "";
+}
+
+function getMonthKey(dateValue){
+  if(!dateValue) return "";
+  const date = new Date(`${dateValue}T00:00:00`);
+  if(Number.isNaN(date.getTime())) return "";
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function getRecentMonths(count = 6){
+  const months = [];
+  const today = new Date();
+  for(let offset = count - 1; offset >= 0; offset--){
+    const date = new Date(today.getFullYear(), today.getMonth() - offset, 1);
+    months.push({
+      key: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`,
+      label: date.toLocaleDateString("en-IN", { month:"short", year:"2-digit" })
+    });
+  }
+  return months;
+}
+
+async function loadDashboard(){
+  const status = document.getElementById("dashboardStatus");
+  if(status) status.textContent = "Updating dashboard...";
+
+  try{
+    const [purchaseRes, paymentRes] = await Promise.all([
+      fetch(
+        `${REST_BASE}/purchases?select=date,purchase_price,selling_price,transport_cost`,
+        { headers: HEADERS }
+      ),
+      fetch(
+        `${REST_BASE}/payments?select=date,party_type,amount`,
+        { headers: HEADERS }
+      )
+    ]);
+
+    if(!purchaseRes.ok || !paymentRes.ok){
+      throw new Error("Dashboard data could not be loaded");
+    }
+
+    const purchases = await purchaseRes.json();
+    const payments = await paymentRes.json();
+    const now = new Date();
+    const currentMonthKey =
+      `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    const monthPurchases = purchases.filter(row => getMonthKey(row.date) === currentMonthKey);
+    const monthPayments = payments.filter(row => getMonthKey(row.date) === currentMonthKey);
+
+    const monthlySales = monthPurchases.reduce(
+      (sum,row) => sum + Number(row.selling_price || 0),
+      0
+    );
+    const monthlyProfit = monthPurchases.reduce(
+      (sum,row) =>
+        sum +
+        Number(row.selling_price || 0) -
+        Number(row.purchase_price || 0) -
+        Number(row.transport_cost || 0),
+      0
+    );
+
+    const allSales = purchases.reduce(
+      (sum,row) => sum + Number(row.selling_price || 0),
+      0
+    );
+    const allPurchases = purchases.reduce(
+      (sum,row) => sum + Number(row.purchase_price || 0),
+      0
+    );
+    const customerPayments = payments
+      .filter(row => row.party_type === "customer")
+      .reduce((sum,row) => sum + Number(row.amount || 0), 0);
+    const supplierPayments = payments
+      .filter(row => row.party_type === "supplier")
+      .reduce((sum,row) => sum + Number(row.amount || 0), 0);
+    const receivedThisMonth = monthPayments
+      .filter(row => row.party_type === "customer")
+      .reduce((sum,row) => sum + Number(row.amount || 0), 0);
+    const paidThisMonth = monthPayments
+      .filter(row => row.party_type === "supplier")
+      .reduce((sum,row) => sum + Number(row.amount || 0), 0);
+
+    document.getElementById("dashboardSales").textContent = formatMoney(monthlySales);
+    document.getElementById("dashboardProfit").textContent = formatMoney(monthlyProfit);
+    document.getElementById("dashboardReceivable").textContent =
+      formatMoney(allSales - customerPayments);
+    document.getElementById("dashboardPayable").textContent =
+      formatMoney(allPurchases - supplierPayments);
+    document.getElementById("dashboardReceived").textContent =
+      formatMoney(receivedThisMonth);
+    document.getElementById("dashboardPaid").textContent = formatMoney(paidThisMonth);
+    document.getElementById("dashboardPeriod").textContent =
+      now.toLocaleDateString("en-IN", { month:"long", year:"numeric" });
+
+    const recentMonths = getRecentMonths();
+    const chartSales = recentMonths.map(month =>
+      purchases
+        .filter(row => getMonthKey(row.date) === month.key)
+        .reduce((sum,row) => sum + Number(row.selling_price || 0), 0)
+    );
+    const chartProfit = recentMonths.map(month =>
+      purchases
+        .filter(row => getMonthKey(row.date) === month.key)
+        .reduce(
+          (sum,row) =>
+            sum +
+            Number(row.selling_price || 0) -
+            Number(row.purchase_price || 0) -
+            Number(row.transport_cost || 0),
+          0
+        )
+    );
+
+    const chartCanvas = document.getElementById("dashboardChart");
+    if(dashboardChartInstance){
+      dashboardChartInstance.destroy();
+    }
+
+    dashboardChartInstance = new Chart(chartCanvas, {
+      type:"bar",
+      data:{
+        labels:recentMonths.map(month => month.label),
+        datasets:[
+          {
+            label:"Sales",
+            data:chartSales,
+            backgroundColor:"rgba(37,99,235,.82)",
+            borderRadius:6,
+            maxBarThickness:28
+          },
+          {
+            label:"Profit",
+            data:chartProfit,
+            backgroundColor:"rgba(22,163,74,.76)",
+            borderRadius:6,
+            maxBarThickness:28
+          }
+        ]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        interaction:{ mode:"index", intersect:false },
+        plugins:{
+          legend:{
+            position:"bottom",
+            labels:{ usePointStyle:true, boxWidth:8, padding:16 }
+          },
+          tooltip:{
+            callbacks:{
+              label(context){
+                return `${context.dataset.label}: ${formatMoney(context.raw)}`;
+              }
+            }
+          }
+        },
+        scales:{
+          x:{ grid:{ display:false }, border:{ display:false } },
+          y:{
+            beginAtZero:true,
+            border:{ display:false },
+            grid:{ color:"rgba(15,23,42,.06)" },
+            ticks:{
+              callback(value){
+                return `₹${Number(value).toLocaleString("en-IN", { notation:"compact" })}`;
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if(status) status.textContent = "Balances include recorded customer and supplier payments.";
+    lucide.createIcons();
+  } catch(error){
+    console.error(error);
+    if(status) status.textContent = "Dashboard could not be loaded. Check your connection.";
+  }
 }
 
 /* ================= FORMAT QUANTITY (unchanged) ================= */
@@ -1074,18 +1623,21 @@ async function downloadPDF() {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF("p", "mm", "a4");
 
-  const rows = filteredLedgerData.length
+  const baseRows = filteredLedgerData.length
     ? filteredLedgerData
     : window.ledgerData;
+  const dateFrom = getDateInputValue("ledgerDateFrom");
+  const dateTo = getDateInputValue("ledgerDateTo");
+  const rows = filterRowsByDate(baseRows, dateFrom, dateTo, "dateRaw");
 
   if (!rows.length) {
-    alert("No data");
+    alert("No ledger data found for the selected date range");
     return;
   }
 
   const name = localStorage.sel;
   const isCustomer = localStorage.ledgerType === "customer";
-  const today = new Date().toLocaleDateString("en-GB");
+  const today = new Date().toISOString().slice(0, 10);
 
   let y = 16;
 
@@ -1103,7 +1655,9 @@ async function downloadPDF() {
   pdf.setFontSize(10);
   pdf.text(`${isCustomer ? "Customer" : "Supplier"} : ${name}`, 15, y);
   y += 6;
-  pdf.text(`Statement Date : ${today}`, 15, y);
+  pdf.text(`Statement Date : ${formatPdfDate(today)}`, 15, y);
+  y += 6;
+  pdf.text(`Period : ${formatRangeLabel(dateFrom, dateTo)}`, 15, y);
 
   /* ================= CALCULATIONS ================= */
   let totalAmount = 0;
@@ -1117,7 +1671,8 @@ async function downloadPDF() {
     `${REST_BASE}/payments?select=date,mode,amount&party_type=eq.${localStorage.ledgerType}&party_name=eq.${encodeURIComponent(name)}`,
     { headers: HEADERS }
   );
-  const payments = payRes.ok ? await payRes.json() : [];
+  const allPayments = payRes.ok ? await payRes.json() : [];
+  const payments = filterRowsByDate(allPayments, dateFrom, dateTo);
   // 🔥 SORT OLDEST FIRST
 payments.sort((a, b) => {
   return new Date(a.date) - new Date(b.date);
@@ -1204,7 +1759,7 @@ payments.sort((a, b) => {
       ? Number(r.selling_price || 0)
       : Number(r.purchase_price || 0);
 
-    pdf.text(r.date || "-", 15, y);
+    pdf.text(formatPdfDate(r.dateRaw), 15, y);
     pdf.text(r.product || "-", 41, y, { maxWidth: 35 });
     pdf.text(r.quantity || "-", 70, y);
     pdf.text(`Rs. ${fmt(price)}`, 100, y);
@@ -1239,17 +1794,7 @@ payments.sort((a, b) => {
         y = 20;
       }
 
-       pdf.text(
-  p.date
-    ? new Date(p.date).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric"
-      })
-    : "-",
-  20,   // keep your original X value (20 or 30 depending on function)
-  y
-);
+       pdf.text(formatPdfDate(p.date), 20, y);
 
       pdf.text(p.mode || "-", 90, y);
       pdf.text(`Rs. ${fmt(p.amount)}`, 195, y, { align:"right" });
@@ -1281,14 +1826,17 @@ async function downloadPDFShort(){
 
   const isCustomer = localStorage.ledgerType === "customer";
   const name = localStorage.sel;
-  const today = new Date().toLocaleDateString("en-GB");
+  const today = new Date().toISOString().slice(0, 10);
 
-  const rows = filteredLedgerData.length
+  const baseRows = filteredLedgerData.length
     ? filteredLedgerData
     : window.ledgerData;
+  const dateFrom = getDateInputValue("ledgerDateFrom");
+  const dateTo = getDateInputValue("ledgerDateTo");
+  const rows = filterRowsByDate(baseRows, dateFrom, dateTo, "dateRaw");
 
   if(!rows.length){
-    alert("No data");
+    alert("No ledger data found for the selected date range");
     return;
   }
 
@@ -1303,7 +1851,8 @@ async function downloadPDFShort(){
     `${REST_BASE}/payments?select=date,mode,amount&party_type=eq.${localStorage.ledgerType}&party_name=eq.${encodeURIComponent(name)}`,
     { headers: HEADERS }
   );
-  const payments = payRes.ok ? await payRes.json() : [];
+  const allPayments = payRes.ok ? await payRes.json() : [];
+  const payments = filterRowsByDate(allPayments, dateFrom, dateTo);
   // 🔥 SORT OLDEST FIRST
 payments.sort((a, b) => {
   return new Date(a.date) - new Date(b.date);
@@ -1326,9 +1875,10 @@ payments.sort((a, b) => {
   y += 10;
   pdf.setFontSize(10);
   pdf.text(`${isCustomer ? "Customer" : "Supplier"} : ${name}`, 15, y);
-  pdf.text(`Statement Date : ${today}`, 15, y + 6);
+  pdf.text(`Statement Date : ${formatPdfDate(today)}`, 15, y + 6);
+  pdf.text(`Period : ${formatRangeLabel(dateFrom, dateTo)}`, 15, y + 12);
 
-  y += 18;
+  y += 24;
 
   const leftX = 15;
   const rightX = 110;
@@ -1404,7 +1954,7 @@ payments.sort((a, b) => {
 
     const price = isCustomer ? r.selling_price : r.purchase_price;
 
-    pdf.text(r.date || "-", 20, y);
+    pdf.text(formatPdfDate(r.dateRaw), 20, y);
     pdf.text(r.product || "-", 60, y, { maxWidth: 45 });
     pdf.text(r.quantity || "-", 115, y);
     pdf.text(`Rs. ${fmt(price)}`, 170, y, { align:"right" });
@@ -1433,17 +1983,7 @@ payments.sort((a, b) => {
         y = 20;
       }
 
-      pdf.text(
-  p.date
-    ? new Date(p.date).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric"
-      })
-    : "-",
-  20,   // keep your original X value (20 or 30 depending on function)
-  y
-);
+      pdf.text(formatPdfDate(p.date), 20, y);
       pdf.text(p.mode || "-", 90, y);
       pdf.text(`Rs. ${fmt(p.amount)}`, 170, y, { align:"right" });
       y += 6;
@@ -1832,12 +2372,12 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 window.addEventListener("popstate", (e) => {
-  const page = e.state?.page || "home";
+  const page = e.state?.page || "dashboard";
   show(page, false);
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  const pageFromHash = location.hash.replace("#", "") || "home";
+  const pageFromHash = location.hash.replace("#", "") || "dashboard";
   show(pageFromHash, false);
 });
 
@@ -2265,6 +2805,8 @@ async function downloadPaymentStatement(){
   const form = document.getElementById("paymentForm");
   const type = form.party_type.value;
   const name = form.party_name.value.trim();
+  const dateFrom = getDateInputValue("paymentDateFrom");
+  const dateTo = getDateInputValue("paymentDateTo");
 
   if(!name){
     alert("Select Supplier / Customer first");
@@ -2282,15 +2824,16 @@ async function downloadPaymentStatement(){
     return;
   }
 
-  const payments = await res.json();
+  const allPayments = await res.json();
+  const payments = filterRowsByDate(allPayments, dateFrom, dateTo);
 
   if(!payments.length){
-    alert("No payments found");
+    alert("No payments found for the selected date range");
     return;
   }
 
   let y = 18;
-  const today = new Date().toLocaleDateString("en-GB");
+  const today = new Date().toISOString().slice(0, 10);
 
   // ===== CALCULATE TOTAL FIRST =====
   let total = payments.reduce((sum,p)=> sum + Number(p.amount || 0), 0);
@@ -2313,12 +2856,15 @@ async function downloadPaymentStatement(){
   y += 6;
 
   // 🔥 STATEMENT DATE + TOTAL ON SAME LINE
-  pdf.text(`Statement Date : ${today}`, 15, y);
+  pdf.text(`Statement Date : ${formatPdfDate(today)}`, 15, y);
 
   pdf.setFont("helvetica","bold");
   pdf.text(`Total Payment : Rs. ${fmt(total)}`, 135, y, { align:"right" });
 
   pdf.setFont("helvetica","normal");
+
+  y += 6;
+  pdf.text(`Period : ${formatRangeLabel(dateFrom, dateTo)}`, 15, y);
 
   y += 14;
 
@@ -2341,13 +2887,7 @@ async function downloadPaymentStatement(){
       y = 20;
     }
 
-    const formattedDate = p.date
-      ? new Date(p.date).toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric"
-        })
-      : "-";
+    const formattedDate = formatPdfDate(p.date);
 
     pdf.text(formattedDate, 20, y);
     pdf.text(p.mode || "-", 80, y);
